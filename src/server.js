@@ -67,7 +67,7 @@ const addWatermarkToPdf = async (pdfBytes) => {
     return await pdfDoc.save();
 };
 
-const convertPdfToJpeg = async (pdfPath, outputPath) => {
+const convertPdfToJpeg = async (pdfPath, outputPath, pageCount) => {
     const command = `pdftoppm -jpeg ${pdfPath} ${outputPath}`;
     console.log('Running command:', command);
     try {
@@ -82,8 +82,12 @@ const convertPdfToJpeg = async (pdfPath, outputPath) => {
         // Collect all generated images
         const images = [];
         let pageNum = 1;
-        while (fs.existsSync(`${outputPath}-${String(pageNum).padStart(2, '0')}.jpg`)) {
-            const imagePath = `${outputPath}-${String(pageNum).padStart(2, '0')}.jpg`;
+        let padNum = 1
+        if( pageCount >= 10 ){
+            padNum = 2
+        }
+        while (fs.existsSync(`${outputPath}-${String(pageNum).padStart(padNum, '0')}.jpg`)) {
+            const imagePath = `${outputPath}-${String(pageNum).padStart(padNum, '0')}.jpg`;
             console.log('Found image:', imagePath);
             images.push(imagePath);
             pageNum++;
@@ -99,8 +103,37 @@ const convertPdfToJpeg = async (pdfPath, outputPath) => {
     }
 };
 
-app.get('/api/pnw', async (req, res) => {
-    const pdfUrl = 'https://cpbpc-documents.s3-ap-southeast-1.amazonaws.com/Worship/pnw.pdf'; // Replace with your PDF URL
+const getPdfPageCount = async (pdfBytes) => {
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+    return pdfDoc.getPageCount();
+}
+const cleanDirectorySync = (directoryPath) => {
+    try {
+        // Read all files in the directory
+        const files = fs.readdirSync(directoryPath);
+
+        // Loop through each file and delete it
+        for (const file of files) {
+            const filePath = path.join(directoryPath, file);
+            const stat = fs.statSync(filePath);
+
+            if (stat.isFile()) {
+                fs.unlinkSync(filePath); // Delete file
+                console.log(`Deleted file: ${filePath}`);
+            } else if (stat.isDirectory()) {
+                cleanDirectorySync(filePath); // Recursively clean subdirectories
+                fs.rmdirSync(filePath); // Remove empty directory
+                console.log(`Deleted directory: ${filePath}`);
+            }
+        }
+        console.log('Directory cleanup complete.');
+    } catch (error) {
+        console.error(`Error cleaning directory: ${error.message}`);
+    }
+}
+app.get('/weekly/:service', async (req, res) => {
+    const service = req.params.service
+    const pdfUrl = `https://cpbpc-documents.s3-ap-southeast-1.amazonaws.com/Worship/${service}.pdf`
 
     try {
         const response = await fetch(pdfUrl);
@@ -109,23 +142,26 @@ app.get('/api/pnw', async (req, res) => {
         const arrayBuffer = await response.arrayBuffer();
         const pdfBytes = Buffer.from(arrayBuffer);
 
-        // Add watermark to PDF
-        const watermarkedPdfBytes = await addWatermarkToPdf(pdfBytes);
-        const tempPdfPath = path.join(__dirname, 'temp.pdf');
-        fs.writeFileSync(tempPdfPath, watermarkedPdfBytes);
-
         // Ensure the output directory exists
-        const imagesDir = path.join(__dirname, '../images');
+        const imagesDir = path.join(__dirname, `../images/${service}`);
         if (!fs.existsSync(imagesDir)) {
             fs.mkdirSync(imagesDir);
+        }else{
+            cleanDirectorySync(imagesDir)
         }
+        
+        const pageCount = await getPdfPageCount(pdfBytes);
+        // Add watermark to PDF
+        // const watermarkedPdfBytes = await addWatermarkToPdf(pdfBytes);
+        const tempPdfPath = path.join(__dirname, `../images/${service}/${service}.pdf`);
+        fs.writeFileSync(tempPdfPath, pdfBytes);
 
         // Convert to JPEG
-        const outputPath = path.join(imagesDir, 'output');
-        const imagePaths = await convertPdfToJpeg(tempPdfPath, outputPath);
+        const outputPath = path.join(imagesDir, 'output')
+        const imagePaths = await convertPdfToJpeg(tempPdfPath, outputPath, pageCount);
 
         // Send response with HTML that shows all images
-        res.render('viewer', { imagePaths: imagePaths.map(img => path.relative(imagesDir, img)) });
+        res.render('viewer', { imagePaths: imagePaths.map(img => `${service}/${path.relative(imagesDir, img)}`) });
 
         // Clean up
         // fs.unlinkSync(tempPdfPath);
