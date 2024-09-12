@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moiré Pattern Example</title>
+<style>
+  .moiré-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .moiré-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('png-transparent-chinese-pattern-moire-cloud-pattern-shading-pattern-shading-chinese-pattern-moire-cloud-pattern.png') repeat;
+    opacity: 0.3; /* Adjust the opacity as needed */
+    pointer-events: none;
+  }
+  .content {
+    position: relative;
+    z-index: 1;
+  }
+</style>
+</head>
+<body>
+<div class="moiré-container">
+  <div class="moiré-pattern"></div>
+  <div class="content">
+    <h1>Your Content Here</h1>
+    <p>This is an example of content with a Moiré pattern overlay.</p>
+  </div>
+</div>
+</body>
+</html>
