@@ -66,7 +66,7 @@ async function searchS3Objects(bucketName, prefix, postfix) {
 }
 
 // Route handler to display hymn images from S3
-app.get('/hymn/:bucket/:hymnNum', async (req, res) => {
+app.get('/hymn/:bucket/num/:hymnNum', async (req, res) => {
     const hymnNum = req.params.hymnNum;
     const bucket = req.params.bucket;
 
