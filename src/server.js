@@ -163,7 +163,7 @@ app.get('/weekly/:service', async (req, res) => {
         const imagePaths = await convertPdfToJpeg(tempPdfPath, outputPath, pageCount);
 
         // Send response with HTML that shows all images
-        res.render('viewer', { imagePaths: imagePaths.map(img => `${service}/${path.relative(imagesDir, img)}`) });
+        res.render('viewer', { docName: 'Church Weekly', imagePaths: imagePaths.map(img => `${service}/${path.relative(imagesDir, img)}`) });
 
         // Clean up
         // fs.unlinkSync(tempPdfPath);
@@ -255,13 +255,13 @@ app.get('/hymn/:bucket/num/:hymnNum', async (req, res) => {
     const bucket = req.params.bucket;
 
     try {
-        const hymnName = await searchS3KeyName(bucket, hymnNum);
-        console.info(`hymnName is ${hymnName}`)
+        const docName = await searchS3KeyName(bucket, hymnNum);
+        console.info(`hymnName is ${docName}`)
         const imageUrls = await searchS3Objects(bucket, hymnNum, '.jpg');
         console.info('Generated pre-signed URLs:', imageUrls);
 
         // Render the viewer template and pass the image URLs
-        res.render('viewer', { imageUrls, hymnName });
+        res.render('viewer', { imageUrls, docName });
     } catch (error) {
         console.error('Error processing hymn images:', error);
         res.status(500).send('Error processing hymn images');
