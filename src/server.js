@@ -232,6 +232,9 @@ async function searchS3KeyName(bucketName, hymnNum) {
             for (const object of data.Contents) {
                 if (object.Key.startsWith(`${hymnNum}_`)) {
                     objectKey = object.Key
+                    if( objectKey.includes('/') ){
+                        objectKey = objectKey.split("/")[0]
+                    }
                 }
             }
 
