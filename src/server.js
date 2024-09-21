@@ -230,7 +230,7 @@ async function searchS3KeyName(bucketName, hymnNum) {
             const data = await s3.send(new ListObjectsV2Command(params));
 
             for (const object of data.Contents) {
-                if (object.Key.startsWith(`${prefix}_`)) {
+                if (object.Key.startsWith(`${hymnNum}_`)) {
                     objectKey = object.Key
                 }
             }
