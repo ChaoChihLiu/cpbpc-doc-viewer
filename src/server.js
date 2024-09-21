@@ -215,17 +215,50 @@ async function searchS3Objects(bucketName, prefix, postfix) {
     return matchingUrls;
 }
 
+async function searchS3KeyName(bucketName, hymnNum) {
+    let continuationToken = null;
+    let objectKey = 'CPBPC Document Viewer'
+
+    do {
+        const params = {
+            Bucket: bucketName,
+            Prefix: `${hymnNum}_`,
+            ContinuationToken: continuationToken
+        };
+
+        try {
+            const data = await s3.send(new ListObjectsV2Command(params));
+
+            for (const object of data.Contents) {
+                if (object.Key.startsWith(`${prefix}_`)) {
+                    objectKey = object.Key
+                }
+            }
+
+            continuationToken = data.IsTruncated ? data.NextContinuationToken : null;
+
+        } catch (err) {
+            console.error('Error listing objects:', err);
+            break;
+        }
+    } while (continuationToken);
+
+    return objectKey;
+}
+
 // Route handler to display hymn images from S3
 app.get('/hymn/:bucket/num/:hymnNum', async (req, res) => {
     const hymnNum = req.params.hymnNum;
     const bucket = req.params.bucket;
 
     try {
+        const hymnName = await searchS3KeyName(bucket, hymnNum);
+        console.info(`hymnName is ${hymnName}`)
         const imageUrls = await searchS3Objects(bucket, hymnNum, '.jpg');
         console.info('Generated pre-signed URLs:', imageUrls);
 
         // Render the viewer template and pass the image URLs
-        res.render('viewer', { imageUrls });
+        res.render('viewer', { imageUrls, hymnName });
     } catch (error) {
         console.error('Error processing hymn images:', error);
         res.status(500).send('Error processing hymn images');
