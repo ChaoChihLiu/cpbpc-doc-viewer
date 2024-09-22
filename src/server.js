@@ -200,7 +200,7 @@ async function searchS3Objects(bucketName, prefix, postfix) {
                         Key: object.Key
                     });
 
-                    const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 }); // URL expires in 1 hour
+                    const signedUrl = await getSignedUrl(s3, command, { expiresIn: 60 }); // URL expires in 1 hour
                     matchingUrls.push(signedUrl);
                 }
             }
