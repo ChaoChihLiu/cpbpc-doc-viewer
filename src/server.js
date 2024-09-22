@@ -16,6 +16,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = 3000;
+app.use(express.json());
 
 // Set the view engine to EJS
 app.set('view engine', 'ejs');
