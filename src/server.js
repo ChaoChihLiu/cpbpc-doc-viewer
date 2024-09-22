@@ -270,6 +270,7 @@ app.get('/hymn/:bucket/num/:hymnNum', async (req, res) => {
 });
 
 app.post('/load-images', async (req, res) => {
+    console.info(`req body ${JSON.stringify(req.body)}`)
     const { bucketName, hymnNum } = req.body;
     
     try {
