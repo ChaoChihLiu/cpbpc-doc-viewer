@@ -256,12 +256,33 @@ app.get('/hymn/:bucket/num/:hymnNum', async (req, res) => {
 
     try {
         const docName = await searchS3KeyName(bucket, hymnNum);
-        console.info(`hymnName is ${docName}`)
-        const imageUrls = await searchS3Objects(bucket, hymnNum, '.jpg');
-        console.info('Generated pre-signed URLs:', imageUrls);
+        // console.info(`hymnName is ${docName}`)
+        // const imageUrls = await searchS3Objects(bucket, hymnNum, '.jpg');
+        // console.info('Generated pre-signed URLs:', imageUrls);
 
         // Render the viewer template and pass the image URLs
-        res.render('viewer', { imageUrls, docName });
+        // res.render('securedViewer', { imageUrls, docName });
+        res.render('securedViewer', { docName, bucket, hymnNum });
+    } catch (error) {
+        console.error('Error processing hymn images:', error);
+        res.status(500).send('Error processing hymn images');
+    }
+});
+
+app.post('/load-images', async (req, res) => {
+    const { bucketName, hymnNum } = req.body;
+    
+    try {
+        // Example logic: you can modify this to fetch images from your actual bucket
+        if (bucketName && hymnNum) {
+
+            const imageUrls = await searchS3Objects(bucketName, hymnNum, '.jpg');
+            console.info('Generated pre-signed URLs:', imageUrls);
+
+            res.json(imageUrls);
+        } else {
+            res.status(400).json({ error: 'Missing bucketName or hymnNum' });
+        }
     } catch (error) {
         console.error('Error processing hymn images:', error);
         res.status(500).send('Error processing hymn images');
