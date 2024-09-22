@@ -53,26 +53,28 @@
         </div>
     </noscript>
 
-    <div class="image-container">
-        <!-- Check if imagePaths exists and display images -->
-        <% if (typeof imagePaths !== 'undefined' && imagePaths.length > 0) { %>
-            <% imagePaths.forEach(image => { %>
-                <div style="position: relative;">
-                    <div class="image-overlay"></div>
-                    <img src="/images/<%= image %>" alt="image file">
-                </div>
-            <% }) %>
-        <% } %>
+    <div id="content-with-js" style="display: none;">
+        <div class="image-container">
+            <!-- Check if imagePaths exists and display images -->
+            <% if (typeof imagePaths !== 'undefined' && imagePaths.length > 0) { %>
+                <% imagePaths.forEach(image => { %>
+                    <div style="position: relative;">
+                        <div class="image-overlay"></div>
+                        <img src="/images/<%= image %>" alt="image file">
+                    </div>
+                <% }) %>
+            <% } %>
 
-        <!-- Check if imageUrls exists and display images -->
-        <% if (typeof imageUrls !== 'undefined' && imageUrls.length > 0) { %>
-            <% imageUrls.forEach(image => { %>
-                <div style="position: relative;">
-                    <div class="image-overlay"></div>
-                    <img src="<%= image %>" alt="image file">
-                </div>
-            <% }) %>
-        <% } %>
+            <!-- Check if imageUrls exists and display images -->
+            <% if (typeof imageUrls !== 'undefined' && imageUrls.length > 0) { %>
+                <% imageUrls.forEach(image => { %>
+                    <div style="position: relative;">
+                        <div class="image-overlay"></div>
+                        <img src="<%= image %>" alt="image file">
+                    </div>
+                <% }) %>
+            <% } %>
+        </div>
     </div>
 
     <!-- Disable right-click, copy, paste, and touch actions -->
