@@ -7,7 +7,9 @@ import path from 'path';
 import {fileURLToPath} from 'url';
 import util from 'util';
 import {GetObjectCommand, ListObjectsV2Command, S3Client} from '@aws-sdk/client-s3';
-import {getSignedUrl} from '@aws-sdk/s3-request-presigner';
+import {getSignedUrl} from '@aws-sdk/s3-request-presigner'
+import uuidv4 from 'uuid'
+import _ from 'lodash'
 
 const execPromise = util.promisify(exec);
 
@@ -250,6 +252,7 @@ async function searchS3KeyName(bucketName, hymnNum) {
     return objectKey;
 }
 
+const codes = []
 // Route handler to display hymn images from S3
 app.get('/hymn/:bucket/num/:hymnNum', async (req, res) => {
     const hymnNum = req.params.hymnNum;
@@ -257,13 +260,15 @@ app.get('/hymn/:bucket/num/:hymnNum', async (req, res) => {
 
     try {
         const docName = await searchS3KeyName(bucket, hymnNum);
+        const code = uuidv4()
+        codes.push(code)
         // console.info(`hymnName is ${docName}`)
         // const imageUrls = await searchS3Objects(bucket, hymnNum, '.jpg');
         // console.info('Generated pre-signed URLs:', imageUrls);
 
         // Render the viewer template and pass the image URLs
         // res.render('securedViewer', { imageUrls, docName });
-        res.render('securedViewer', { docName, bucket, hymnNum });
+        res.render('securedViewer', { docName, bucket, hymnNum, code });
     } catch (error) {
         console.error('Error processing hymn images:', error);
         res.status(500).send('Error processing hymn images');
@@ -272,10 +277,15 @@ app.get('/hymn/:bucket/num/:hymnNum', async (req, res) => {
 
 app.post('/load-images', async (req, res) => {
     console.info(`req body ${JSON.stringify(req.body)}`)
-    const { bucketName, hymnNum } = req.body;
+    const { bucketName, hymnNum, code } = req.body;
     
     try {
-        // Example logic: you can modify this to fetch images from your actual bucket
+        if(!_.includes(codes, code)){
+            res.status(404).send('Hymn not found')
+            return
+        }
+        _.remove(codes, (value) => value === code)
+
         if (bucketName && hymnNum) {
 
             const imageUrls = await searchS3Objects(bucketName, hymnNum, '.jpg');
@@ -283,7 +293,7 @@ app.post('/load-images', async (req, res) => {
 
             res.json(imageUrls);
         } else {
-            res.status(400).json({ error: 'Missing bucketName or hymnNum' });
+            res.status(400).send('Missing bucketName or hymnNum');
         }
     } catch (error) {
         console.error('Error processing hymn images:', error);
