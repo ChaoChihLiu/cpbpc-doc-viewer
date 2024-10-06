@@ -8,6 +8,8 @@ import {fileURLToPath} from 'url';
 import util from 'util';
 import {GetObjectCommand, ListObjectsV2Command, S3Client} from '@aws-sdk/client-s3';
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner'
+import {v4 as uuidv4} from 'uuid'
+import _ from 'lodash'
 
 const execPromise = util.promisify(exec);
 
@@ -260,9 +262,9 @@ app.get('/hymn/:bucket/num/:hymnNum', async (req, res) => {
         const docName = await searchS3KeyName(bucket, hymnNum);
         const code = uuidv4()
         codes.push(code)
-        console.info(`hymnName is ${docName}`)
-        const imageUrls = await searchS3Objects(bucket, hymnNum, '.jpg');
-        console.info('Generated pre-signed URLs:', imageUrls);
+        // console.info(`hymnName is ${docName}`)
+        // const imageUrls = await searchS3Objects(bucket, hymnNum, '.jpg');
+        // console.info('Generated pre-signed URLs:', imageUrls);
 
         // Render the viewer template and pass the image URLs
         // res.render('securedViewer', { imageUrls, docName });
