@@ -251,7 +251,7 @@ async function searchS3KeyName(bucketName, hymnNum) {
 }
 
 const codes = []
-Route handler to display hymn images from S3
+// Route handler to display hymn images from S3
 app.get('/hymn/:bucket/num/:hymnNum', async (req, res) => {
     const hymnNum = req.params.hymnNum;
     const bucket = req.params.bucket;
