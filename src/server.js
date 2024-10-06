@@ -260,9 +260,9 @@ app.get('/hymn/:bucket/num/:hymnNum', async (req, res) => {
         const docName = await searchS3KeyName(bucket, hymnNum);
         const code = uuidv4()
         codes.push(code)
-        // console.info(`hymnName is ${docName}`)
-        // const imageUrls = await searchS3Objects(bucket, hymnNum, '.jpg');
-        // console.info('Generated pre-signed URLs:', imageUrls);
+        console.info(`hymnName is ${docName}`)
+        const imageUrls = await searchS3Objects(bucket, hymnNum, '.jpg');
+        console.info('Generated pre-signed URLs:', imageUrls);
 
         // Render the viewer template and pass the image URLs
         // res.render('securedViewer', { imageUrls, docName });
