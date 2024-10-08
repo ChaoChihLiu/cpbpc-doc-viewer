@@ -12,8 +12,8 @@ const obfuscatedCode = JavaScriptObfuscator.obfuscate(originalCode, {
 
 
 // Ensure output directory exists
-if (!fs.existsSync('js/')) {
-    fs.mkdirSync('js/');
+if (!fs.existsSync('public/js/')) {
+    fs.mkdirSync('public/js/');
 }
 // Write the obfuscated code to a new file
-fs.writeFileSync('js/obfuscated-script.js', obfuscatedCode);
+fs.writeFileSync('public/js/obfuscated-script.js', obfuscatedCode);
