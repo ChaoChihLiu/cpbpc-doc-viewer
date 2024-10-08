@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js",
+    "start": "node src/obfuscate.js && node src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -25,5 +25,8 @@
     "sharp": "^0.33.5",
     "uuid": "^10.0.0"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "javascript-obfuscator": "^4.1.1"
+  }
 }
