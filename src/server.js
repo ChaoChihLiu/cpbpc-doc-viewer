@@ -10,7 +10,10 @@ import {GetObjectCommand, ListObjectsV2Command, S3Client} from '@aws-sdk/client-
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner'
 import {v4 as uuidv4} from 'uuid'
 import _ from 'lodash'
+import env from 'dotenv'
 
+env.config();
+const showHymnScores = process.env.show_hymn_scores
 const execPromise = util.promisify(exec);
 
 const __filename = fileURLToPath(import.meta.url);
@@ -255,6 +258,11 @@ async function searchS3KeyName(bucketName, hymnNum) {
 const codes = []
 // Route handler to display hymn images from S3
 app.get('/hymn/:bucket/num/:hymnNum', async (req, res) => {
+
+    if( !showHymnScores || showHymnScores == false ){
+        res.status(404).send('Resource Not Found');
+    }
+
     const hymnNum = req.params.hymnNum;
     const bucket = req.params.bucket;
 
@@ -276,6 +284,10 @@ app.get('/hymn/:bucket/num/:hymnNum', async (req, res) => {
 });
 
 app.post('/load-images', async (req, res) => {
+    if( !showHymnScores || showHymnScores == false ){
+        res.status(404).send('Resource Not Found');
+    }
+
     console.info(`req body ${JSON.stringify(req.body)}`)
     const { bucketName, hymnNum, code } = req.body;
 
