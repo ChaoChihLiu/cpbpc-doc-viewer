@@ -13,7 +13,7 @@ import _ from 'lodash'
 import env from 'dotenv'
 
 env.config();
-const showHymnScores = process.env.show_hymn_scores
+const showHymnScores = process.env.show_hymn_scores === 'true'
 const execPromise = util.promisify(exec);
 
 const __filename = fileURLToPath(import.meta.url);
@@ -259,14 +259,10 @@ const codes = []
 // Route handler to display hymn images from S3
 app.get('/hymn/:bucket/num/:hymnNum', async (req, res) => {
 
-    console.info(`test env ${showHymnScores == false}`)
-    console.info(`test env ${typeof showHymnScores}`)
     if( !showHymnScores || showHymnScores == false ){
-        console.info(`test not show scores`)
         res.status(404).send('Resource Not Found');
         return
     }
-    console.info(`test show scores`)
     const hymnNum = req.params.hymnNum;
     const bucket = req.params.bucket;
 
