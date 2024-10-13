@@ -259,11 +259,14 @@ const codes = []
 // Route handler to display hymn images from S3
 app.get('/hymn/:bucket/num/:hymnNum', async (req, res) => {
 
+    console.info(`test env ${showHymnScores}`)
+    console.info(`test env ${process.env.show_hymn_scores}`)
     if( !showHymnScores || showHymnScores == false ){
+        console.info(`test not show scores`)
         res.status(404).send('Resource Not Found');
         return
     }
-
+    console.info(`test show scores`)
     const hymnNum = req.params.hymnNum;
     const bucket = req.params.bucket;
 
