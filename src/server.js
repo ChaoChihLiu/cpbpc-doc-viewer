@@ -261,6 +261,7 @@ app.get('/hymn/:bucket/num/:hymnNum', async (req, res) => {
 
     if( !showHymnScores || showHymnScores == false ){
         res.status(404).send('Resource Not Found');
+        return
     }
 
     const hymnNum = req.params.hymnNum;
@@ -286,6 +287,7 @@ app.get('/hymn/:bucket/num/:hymnNum', async (req, res) => {
 app.post('/load-images', async (req, res) => {
     if( !showHymnScores || showHymnScores == false ){
         res.status(404).send('Resource Not Found');
+        return
     }
 
     console.info(`req body ${JSON.stringify(req.body)}`)
