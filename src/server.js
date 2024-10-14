@@ -289,7 +289,7 @@ app.get('/:accessKey/:bucket/num/:hymnNum', async (req, res) => {
     const bucket = req.params.bucket;
 
     try {
-        const isValidKey = verifyAccessKey(accessKey)
+        const isValidKey = await verifyAccessKey(accessKey)
         if( !isValidKey ){
             res.status(404).send('Access Key invalid, search hymn again')
             return
