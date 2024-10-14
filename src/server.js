@@ -256,17 +256,47 @@ async function searchS3KeyName(bucketName, hymnNum) {
 }
 
 const codes = []
+
+async function verifyAccessKey(accessKey) {
+    let queryStat = `
+        select *
+        from cpbpc_hymn_access
+        where access_key = ?
+        order by key_create_time desc limit 1
+    `;
+    logger.info(`query statement : ${mysql.format(queryStat, [accessKey])}`)
+    let [rows, fields] = await pool.query(queryStat, [accessKey])
+    let row = rows[0]
+    const currentTime = new Date()
+    const tenMinutesAgo = new Date(currentTime.getTime() - 10 * 60 * 1000)
+
+    const keyCreateTime = new Date(row['key_create_time']);
+    if (keyCreateTime >= tenMinutesAgo) {
+        return true
+    }
+
+    return false
+}
+
 // Route handler to display hymn images from S3
-app.get('/hymn/:bucket/num/:hymnNum', async (req, res) => {
+app.get('/:accessKey/:bucket/num/:hymnNum', async (req, res) => {
 
     if( !showHymnScores || showHymnScores == false ){
-        res.status(404).send('Resource Not Found');
+        res.status(404).send('Resource Not Found')
         return
     }
+
+    const accessKey = req.params.accessKey;
     const hymnNum = req.params.hymnNum;
     const bucket = req.params.bucket;
 
     try {
+        const isValidKey = verifyAccessKey(accessKey)
+        if( !isValidKey ){
+            res.status(404).send('Access Key invalid, search hymn again')
+            return
+        }
+
         const docName = await searchS3KeyName(bucket, hymnNum);
         const code = uuidv4()
         codes.push(code)
