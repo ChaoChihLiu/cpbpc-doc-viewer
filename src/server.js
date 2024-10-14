@@ -11,7 +11,8 @@ import {getSignedUrl} from '@aws-sdk/s3-request-presigner'
 import {v4 as uuidv4} from 'uuid'
 import _ from 'lodash'
 import env from 'dotenv'
-import logger from './logger.mjs'
+import logger from './logger.js'
+import pool from "./dbConnPool.js"
 
 env.config();
 const showHymnScores = process.env.show_hymn_scores === 'true'
