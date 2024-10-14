@@ -262,23 +262,18 @@ const codes = []
 
 async function verifyAccessKey(accessKey) {
     let queryStat = `
-        select *
-        from cpbpc_hymn_access
-        where access_key = ?
-        order by key_create_time desc limit 1
+        SELECT *
+        FROM cpbpc_hymn_access
+        WHERE key_create_time >= DATE_SUB(NOW(), INTERVAL 10 MINUTE)
+            and access_key = ?
     `;
     logger.info(`query statement : ${mysql.format(queryStat, [accessKey])}`)
     let [rows, fields] = await pool.query(queryStat, [accessKey])
-    let row = rows[0]
-    const currentTime = new Date()
-    const tenMinutesAgo = new Date(currentTime.getTime() - 10 * 60 * 1000)
-
-    const keyCreateTime = new Date(row['key_create_time']);
-    if (keyCreateTime >= tenMinutesAgo) {
-        return true
+    if( !rows || _.isEmpty(rows) ){
+        return false
     }
-
-    return false
+    
+    return true
 }
 
 // Route handler to display hymn images from S3
