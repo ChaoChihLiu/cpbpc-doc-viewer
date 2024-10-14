@@ -13,6 +13,7 @@ import _ from 'lodash'
 import env from 'dotenv'
 import logger from './logger.js'
 import pool from "./dbConnPool.js"
+import mysql from "mysql2/promise"
 
 env.config();
 const showHymnScores = process.env.show_hymn_scores === 'true'
