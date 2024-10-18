@@ -329,7 +329,7 @@ app.post('/load-images', async (req, res) => {
 
         if (bucketName && hymnNum) {
 
-            const imageUrls = await searchS3Objects(bucketName, hymnNum, '.jpg');
+            const imageUrls = await searchS3Objects(bucketName, hymnNum, '_watermarked.jpg');
             console.info('Generated pre-signed URLs:', imageUrls);
 
             res.json(imageUrls);
