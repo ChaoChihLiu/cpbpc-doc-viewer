@@ -322,7 +322,7 @@ app.get('/:accessKey/cpbpc-hymn/:hymnCode', async (req, res) => {
 
         // Render the viewer template and pass the image URLs
         // res.render('securedViewer', { imageUrls, docName });
-        res.render('securedViewer', { docName, bucket, hymnNum, code });
+        res.render('securedViewer', { docName, bucket, hymnCode, code });
     } catch (error) {
         console.error('Error processing hymn images:', error);
         res.status(500).send('Error processing hymn images');
