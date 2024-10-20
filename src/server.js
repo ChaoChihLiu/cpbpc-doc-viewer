@@ -290,7 +290,7 @@ async function queryHymnNumber(hymnCode) {
         return 0
     }
 
-    return rows['seq_no']
+    return rows[0]['seq_no']
 }
 
 // Route handler to display hymn images from S3
