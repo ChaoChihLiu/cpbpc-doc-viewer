@@ -224,9 +224,11 @@ async function searchS3Objects(bucketName, prefix, postfix) {
     return matchingUrls;
 }
 
-async function searchS3KeyName(bucketName, hymnNum) {
+async function searchS3KeyName(bucketName, hymnCode) {
     let continuationToken = null;
     let objectKey = 'CPBPC Document Viewer'
+
+    const hymnNum = await queryHymnNumber(hymnCode)
 
     do {
         const params = {
@@ -276,8 +278,23 @@ async function verifyAccessKey(accessKey) {
     return true
 }
 
+async function queryHymnNumber(hymnCode) {
+    let queryStat = `
+        SELECT *
+        FROM cpbpc_hymn
+        WHERE  alias = ?
+    `;
+    logger.info(`query statement : ${mysql.format(queryStat, [hymnCode])}`)
+    let [rows, fields] = await pool.query(queryStat, [hymnCode])
+    if( !rows || _.isEmpty(rows) ){
+        return 0
+    }
+
+    return rows['seq_no']
+}
+
 // Route handler to display hymn images from S3
-app.get('/:accessKey/:bucket/num/:hymnNum', async (req, res) => {
+app.get('/:accessKey/cpbpc-hymn/:hymnCode', async (req, res) => {
 
     if( !showHymnScores || showHymnScores == false ){
         res.status(404).send('Resource Not Found')
@@ -285,8 +302,9 @@ app.get('/:accessKey/:bucket/num/:hymnNum', async (req, res) => {
     }
 
     const accessKey = req.params.accessKey;
-    const hymnNum = req.params.hymnNum;
-    const bucket = req.params.bucket;
+    const hymnCode = req.params.hymnCode;
+    // const bucket = req.params.bucket;
+    const bucket = 'cpbpc-hymn'
 
     try {
         const isValidKey = await verifyAccessKey(accessKey)
@@ -295,7 +313,7 @@ app.get('/:accessKey/:bucket/num/:hymnNum', async (req, res) => {
             return
         }
 
-        const docName = await searchS3KeyName(bucket, hymnNum);
+        const docName = await searchS3KeyName(bucket, hymnCode);
         const code = uuidv4()
         codes.push(code)
         // console.info(`hymnName is ${docName}`)
