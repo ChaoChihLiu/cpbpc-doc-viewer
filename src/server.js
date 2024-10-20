@@ -336,7 +336,7 @@ app.post('/load-images', async (req, res) => {
     }
 
     console.info(`req body ${JSON.stringify(req.body)}`)
-    const { bucketName, hymnNum, code } = req.body;
+    const { bucketName, hymnCode, code } = req.body;
 
     try {
         if(!_.includes(codes, code)){
@@ -345,8 +345,8 @@ app.post('/load-images', async (req, res) => {
         }
         _.remove(codes, (value) => value === code)
 
-        if (bucketName && hymnNum) {
-
+        if (bucketName && hymnCode) {
+            const hymnNum = await queryHymnNumber(hymnCode)
             const imageUrls = await searchS3Objects(bucketName, hymnNum, '_watermarked.jpg');
             console.info('Generated pre-signed URLs:', imageUrls);
 
